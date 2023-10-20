@@ -5,6 +5,7 @@ import { Container } from 'semantic-ui-react'
 import OrderTable from './OrderTable'
 import { orderApi } from '../misc/OrderApi'
 import { handleLogError } from '../misc/Helpers'
+import { getUsernameFunc } from '../misc/Helpers'
 
 class UserPage extends Component {
 
@@ -19,9 +20,12 @@ class UserPage extends Component {
   async componentDidMount() {
     const { keycloak } = this.props
     const isUser = isUserFunc(keycloak)
+    const getUsername = () => {
+      return getUsernameFunc(keycloak)
+    }  
     try {
-      const response = await orderApi.getUserExtrasMe(keycloak.token)
-      const { user } = response.data
+      const response = getUsername();
+      const { user } = response
       this.setState({ user, isUser })
     } catch (error) {
       handleLogError(error)
@@ -36,18 +40,7 @@ class UserPage extends Component {
 
   handleGetUserMe = () => {
     const user = this.state.user
-
-    this.setState({ isLoading: true })
-    orderApi.getUserMe(user)
-      .then(response => {
-        this.setState({ userMe: response.data })
-      })
-      .catch(error => {
-        handleLogError(error)
-      })
-      .finally(() => {
-        this.setState({ isLoading: false })
-      })
+    this.setState({ userMe: user })
   }
   
   handleCreateOrder = () => {

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Container } from 'semantic-ui-react'
-import { withKeycloak } from '@react-keycloak/web'
 import { isAdminFunc } from '../misc/Helpers'
 import { orderApi } from '../misc/OrderApi'
 import AdminTab from './AdminTab'
@@ -175,4 +174,4 @@ class AdminPage extends Component {
   }
 }
 
-export default withKeycloak(AdminPage)
+export default AdminPage

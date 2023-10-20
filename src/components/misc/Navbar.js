@@ -56,4 +56,4 @@ function Navbar(props) {
   )
 }
 
-export default NavLink(Navbar)
+export default Navbar
