@@ -5,11 +5,13 @@ import { isAdminFunc } from '../misc/Helpers'
 import { orderApi } from '../misc/OrderApi'
 import AdminTab from './AdminTab'
 import { handleLogError } from '../misc/Helpers'
+import { getKeycloak } from '../misc/Helpers'
+
 
 class AdminPage extends Component {
 
   state = {
-    user: null,
+    token: null,
     users: [],
     orders: [],
     orderDescription: '',
@@ -20,16 +22,13 @@ class AdminPage extends Component {
     isOrdersLoading: false,
   }
 
-  async componentDidMount() {
-    const { keycloak } = this.props
+  componentDidMount() {
+    const  keycloak = getKeycloak()
+    const user = keycloak.tokenParsed.preferred_username
+    console.log(keycloak.token)
     const isAdmin = isAdminFunc(keycloak)
-    try {
-      const response = await orderApi.getUserExtrasMe(keycloak.token)
-      const { user } = response.data
-      this.setState({ user, isAdmin })
-    } catch (error) {
-      handleLogError(error)
-    }
+    this.state.token = keycloak.token
+    this.state.isAdmin = isAdmin
 
     this.handleGetUsers()
     this.handleGetOrders()
@@ -40,10 +39,9 @@ class AdminPage extends Component {
   }
 
   handleGetUsers = () => {
-    const user = this.state.user
-
+    const token = this.state.token
     this.setState({ isUsersLoading: true })
-    orderApi.getUsers(user)
+    orderApi.getUsers(token)
       .then(response => {
         this.setState({ users: response.data })
       })
@@ -56,9 +54,9 @@ class AdminPage extends Component {
   }
 
   handleDeleteUser = (username) => {
-    const user = this.state.user
+    const token = this.state.token
 
-    orderApi.deleteUser(user, username)
+    orderApi.deleteUser(token, username)
       .then(() => {
         this.handleGetUsers()
       })
@@ -68,10 +66,10 @@ class AdminPage extends Component {
   }
 
   handleSearchUser = () => {
-    const user = this.state.user
+    const token = this.state.token
 
     const username = this.state.userUsernameSearch
-    orderApi.getUsers(user, username)
+    orderApi.getUsers(token, username)
       .then(response => {
         const data = response.data
         const users = data instanceof Array ? data : [data]
@@ -84,10 +82,10 @@ class AdminPage extends Component {
   }
 
   handleGetOrders = () => {
-    const user = this.state.user
+    const token = this.state.token
 
     this.setState({ isOrdersLoading: true })
-    orderApi.getOrders(user)
+    orderApi.getOrders(token)
       .then(response => {
         this.setState({ orders: response.data })
       })
@@ -100,9 +98,9 @@ class AdminPage extends Component {
   }
 
   handleDeleteOrder = (isbn) => {
-    const user = this.state.user
+    const token = this.state.token
 
-    orderApi.deleteOrder(user, isbn)
+    orderApi.deleteOrder(token, isbn)
       .then(() => {
         this.handleGetOrders()
       })
@@ -112,7 +110,7 @@ class AdminPage extends Component {
   }
 
   handleCreateOrder = () => {
-    const user = this.state.user
+    const token = this.state.token
 
     let { orderDescription } = this.state
     orderDescription = orderDescription.trim()
@@ -121,7 +119,7 @@ class AdminPage extends Component {
     }
 
     const order = { description: orderDescription }
-    orderApi.createOrder(user, order)
+    orderApi.createOrder(token, order)
       .then(() => {
         this.handleGetOrders()
         this.setState({ orderDescription: '' })
@@ -132,10 +130,10 @@ class AdminPage extends Component {
   }
 
   handleSearchOrder = () => {
-    const user = this.state.user
+    const token = this.state.token
 
     const text = this.state.orderTextSearch
-    orderApi.getOrders(user, text)
+    orderApi.getOrders(token, text)
       .then(response => {
         const orders = response.data
         this.setState({ orders })

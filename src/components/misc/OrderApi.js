@@ -21,37 +21,37 @@ function numberOfOrders() {
   return instance.get('/order/public/numberOfOrders')
 }
 
-function getUsers(user) {
+function getUsers(token, user) {
   const url = user ? `/order/users/${user}` : '/order/users'
   return instance.get(url, {
-    headers: { 'Authorization': bearerAuth(user) }
+    headers: { 'Authorization': bearerAuth(token) }
   })
 }
 
-function deleteUser(user) {
+function deleteUser(token, user) {
   return instance.delete(`/order/users/${user}`, {
-    headers: { 'Authorization': bearerAuth(user) }
+    headers: { 'Authorization': bearerAuth(token) }
   })
 }
 
-function getOrders(user, text) {
-  const url = text ? `/order?text=${text}` : '/order'
+function getOrders(token, text) {
+  const url = text ? `/order?text=${text}` : '/order/'
   return instance.get(url, {
-    headers: { 'Authorization': bearerAuth(user) }
+    headers: { 'Authorization': bearerAuth(token) }
   })
 }
 
-function deleteOrder(user, orderId) {
+function deleteOrder(token, orderId) {
   return instance.delete(`/order/${orderId}`, {
-    headers: { 'Authorization': bearerAuth(user) }
+    headers: { 'Authorization': bearerAuth(token) }
   })
 }
 
-function createOrder(user, order) {
+function createOrder(token, order) {
   return instance.post('/order', order, {
     headers: {
       'Content-type': 'application/json',
-      'Authorization': bearerAuth(user)
+      'Authorization': bearerAuth(token)
     }
   })
 }

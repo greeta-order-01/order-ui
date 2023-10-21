@@ -1,3 +1,7 @@
+export const getKeycloak = () => {
+  return JSON.parse(localStorage.getItem('keycloak'))
+}
+
 export function parseJwt(token) {
   if (!token) { return }
   const base64Url = token.split('.')[1]
