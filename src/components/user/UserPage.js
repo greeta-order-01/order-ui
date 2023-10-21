@@ -5,31 +5,24 @@ import { Container } from 'semantic-ui-react'
 import OrderTable from './OrderTable'
 import { orderApi } from '../misc/OrderApi'
 import { handleLogError } from '../misc/Helpers'
-import { getUsernameFunc } from '../misc/Helpers'
+import { getKeycloak } from '../misc/Helpers'
 
 class UserPage extends Component {
 
   state = {
-    user: null,
+    token: null,
     userMe: null,
     isUser: true,
     isLoading: false,
     orderDescription: ''
   }
 
-  async componentDidMount() {
-    const { keycloak } = this.props
+  componentDidMount() {
+    const  keycloak = getKeycloak()
     const isUser = isUserFunc(keycloak)
-    const getUsername = () => {
-      return getUsernameFunc(keycloak)
-    }  
-    try {
-      const response = getUsername();
-      const { user } = response
-      this.setState({ user, isUser })
-    } catch (error) {
-      handleLogError(error)
-    }
+    const token = keycloak.token
+    this.state.token = token
+    this.state.isUser = isUser
 
     this.handleGetUserMe()
   }
@@ -39,12 +32,22 @@ class UserPage extends Component {
   }
 
   handleGetUserMe = () => {
-    const user = this.state.user
-    this.setState({ userMe: user })
+    const token = this.state.token
+    this.setState({ isLoading: true })
+    orderApi.getUserMe(token)
+      .then(response => {
+        this.setState({ userMe: response.data })
+      })
+      .catch(error => {
+        handleLogError(error)
+      })
+      .finally(() => {
+        this.setState({ isLoading: false })
+      })
   }
   
   handleCreateOrder = () => {
-    const user = this.state.user
+    const token = this.state.token
 
     let { orderDescription } = this.state
     orderDescription = orderDescription.trim()
@@ -53,7 +56,7 @@ class UserPage extends Component {
     }
 
     const order = { description: orderDescription }
-    orderApi.createOrder(user, order)
+    orderApi.createOrder(token, order)
       .then(() => {
         this.handleGetUserMe()
         this.setState({ orderDescription: '' })

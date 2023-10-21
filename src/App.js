@@ -22,11 +22,13 @@ function App() {
   const handleOnEvent = async (event, error) => {
     if (event === 'onAuthSuccess') {
       if (keycloak.authenticated) {
-        let response = await orderApi.getUserExtrasMe(keycloak.token)
-        if (response.status === 404) {
-          const userExtra = { avatar: keycloak.tokenParsed.preferred_username }
-          response = await orderApi.saveUserExtrasMe(keycloak.token, userExtra)
-          console.log('UserExtra created for ' + keycloak.tokenParsed.preferred_username)
+        let response = await orderApi.isUserMeExists(keycloak.token)
+        if (response.data.userExists === false) {
+          const username = keycloak.tokenParsed.preferred_username
+          const email = keycloak.tokenParsed.email
+          const userDto = { username: username, name: username, email: email }
+          response = await orderApi.saveUserMe(keycloak.token, userDto)
+          console.log('User created for ' + keycloak.tokenParsed.preferred_username)
         }
       }
     }

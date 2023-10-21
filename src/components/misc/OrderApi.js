@@ -9,8 +9,9 @@ export const orderApi = {
   getOrders,
   deleteOrder,
   createOrder,
-  getUserExtrasMe,
-  saveUserExtrasMe
+  getUserMe,
+  isUserMeExists,
+  saveUserMe
 }
 
 function numberOfUsers() {
@@ -35,7 +36,7 @@ function deleteUser(token, user) {
 }
 
 function getOrders(token, text) {
-  const url = text ? `/order?text=${text}` : '/order/'
+  const url = text ? `/order/?text=${text}` : '/order/'
   return instance.get(url, {
     headers: { 'Authorization': bearerAuth(token) }
   })
@@ -48,7 +49,7 @@ function deleteOrder(token, orderId) {
 }
 
 function createOrder(token, order) {
-  return instance.post('/order', order, {
+  return instance.post('/order/', order, {
     headers: {
       'Content-type': 'application/json',
       'Authorization': bearerAuth(token)
@@ -57,13 +58,19 @@ function createOrder(token, order) {
 }
 
 
-function getUserExtrasMe(token) {
+function getUserMe(token) {
   return instance.get(`/order/users/me`, {
     headers: { 'Authorization': bearerAuth(token) }
   })
 }
 
-function saveUserExtrasMe(token, userExtra) {
+function isUserMeExists(token) {
+  return instance.get(`/order/users/meExists`, {
+    headers: { 'Authorization': bearerAuth(token) }
+  })
+}
+
+function saveUserMe(token, userExtra) {
   return instance.post(`/order/users/me`, userExtra, {
     headers: { 'Authorization': bearerAuth(token) }
   })

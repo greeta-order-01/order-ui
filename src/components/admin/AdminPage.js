@@ -22,10 +22,8 @@ class AdminPage extends Component {
     isOrdersLoading: false,
   }
 
-  componentDidMount() {
+ componentDidMount() {
     const  keycloak = getKeycloak()
-    const user = keycloak.tokenParsed.preferred_username
-    console.log(keycloak.token)
     const isAdmin = isAdminFunc(keycloak)
     this.state.token = keycloak.token
     this.state.isAdmin = isAdmin
@@ -72,7 +70,7 @@ class AdminPage extends Component {
     orderApi.getUsers(token, username)
       .then(response => {
         const data = response.data
-        const users = data instanceof Array ? data : [data]
+        const users = data ? (data instanceof Array ? data : [data]) : [];
         this.setState({ users })
       })
       .catch(error => {
